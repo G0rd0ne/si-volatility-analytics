@@ -1,0 +1,381 @@
+TASK: Si-MOEX-Option-Edge-Analyzer-v4.0
+
+OBJECTIVE: 
+Извлечь максимальный опционный edge из realized volatility данных MOEX Si (USD/RUB) 
+с строгой иерархией: расчётные поля > label-поля, динамика > статика, 
+риск-менеджмент > оптимизация прибыли.
+
+OUTPUT-FORMAT: Structured Markdown with embedded JSON blocks
+
+NOTES-VERSION: 2026-04-17
+ENGINE: dual_vol_engine_0.6.0+
+SCHEMA: 2.6.0
+
+CORE-PRINCIPLES (нерушимые)
+
+{
+  "_priority_hierarchy": {
+    "calculation_over_label": "ROC/semivar/spread/gap_quantiles > regime_classification/state_labels/vol_trend",
+    "dynamics_over_level": "ROC momentum > absolute vol level",
+    "risk_over_return": "Kill conditions > Entry conditions",
+    "flip_over_continuous": "Asymmetry flip detection mandatory",
+    "forecast_gate_strict": "IV - Forecast_RV >= 1.5pp hard constraint"
+  },
+  "_absolute_thresholds": {
+    "VoV_5d": {"stable": [0, 0.25], "elevated": [0.25, 0.4], "extreme": [0.4, 999]},
+    "ROC_5d_short_vol_kill": 30,
+    "ROC_5d_long_vol_trigger": -30,
+    "gap_freq_high": 7,
+    "semivar_ratio": {"absent": [0, 1.1], "mild": [1.1, 1.3], "moderate": [1.3, 1.7], "strong": [1.7, 999]},
+    "premium_gate": 1.5
+  }
+}
+
+STEP-1: REGIME-DIAGNOSTICS
+
+{
+  "_step": 1,
+  "_max_sentences": 5,
+  "level_classification": {
+    "benchmark": "F1_YZ_20d vs F1_YZ_60d vs F0_YZ_60d",
+    "proxy_rule": "if F1_YZ_250d == null → use F0_YZ_250d, explicitly note",
+    "classes": ["low", "normal", "elevated", "crisis", "elevated_crushing"],
+    "elevated_crushing_condition": "YZ_20d_ROC_20d > 0 AND ROC_5d << 0"
+  },
+  "dynamics_analysis": {
+    "ROC_horizons": ["5d", "10d", "20d"],
+    "ratio_YZ_5d_20d": {"compression": [0, 0.75], "stable": [0.75, 1.1], "spike": [1.1, 999]},
+    "contradiction_resolution": "ROC fields override regime_classification.dynamics"
+  },
+  "VoV_regime": {
+    "classification": "use _absolute_thresholds.VoV_5d",
+    "structure_check": "VoV_5d vs VoV_20d vs VoV_60d",
+    "vomma_risk_trigger": "VoV_5d > 0.40 → explicit warning block",
+    "cross_contract": "F1_VoV >> F2_VoV = front-specific stress"
+  },
+  "contradiction_registry": {
+    "required": true,
+    "fields": ["regime_classification", "state_labels", "momentum_5d_vs_20d", "ROC fields"],
+    "resolution": "calculation fields priority with explicit note"
+  }
+}
+
+STEP-2: SAMUELSON-CONTINUITY
+
+{
+  "_step": 2,
+  "_max_sentences": 4,
+  "DTE_assessment": {
+    "primary": "F1 days_to_expiry",
+    "samuelson_status_check": "normal_for_dte confirmed by YZ_20d/YZ_60d ratio",
+    "z_score_rule": "z in [-2, 2] never called extreme",
+    "short_table": {
+      "applicability": "only if holding to DTE < 10",
+      "reliability_note": "n=10-11, directional hint only",
+      "null_DTE": "skip, do not interpolate"
+    }
+  },
+  "F0_F1_continuity": {
+    "vol_change": "F0_YZ_20d vs F1_YZ_20d in pp",
+    "asymmetry_calculation": {
+      "F0_ratio": "F0_semivar_down_20d / F0_semivar_up_20d",
+      "F1_ratio": "F1_semivar_down_20d / F1_semivar_up_20d",
+      "classification": ["continuous_downside", "continuous_upside", "flip", "stable"]
+    },
+    "flip_implication": "flip + elevated vol = double confirmation F1 bias"
+  }
+}
+
+STEP-3: SIGNAL-MATRIX (18 факторов)
+
+{
+  "_step": 3,
+  "_format": "table",
+  "factors": [
+    {"id": 1, "name": "RV_level_vs_historical", "source": "YZ_20d vs YZ_60d", "type": "categorical"},
+    {"id": 2, "name": "RV_trend", "source": "ROC fields", "type": "trend"},
+    {"id": 3, "name": "VoV_regime", "source": "vol_of_vol_5d/20d/60d", "type": "categorical"},
+    {"id": 4, "name": "Return_skew", "source": "skew_5d, skew_20d", "type": "categorical"},
+    {"id": 5, "name": "Return_kurtosis", "source": "kurtosis_5d, kurtosis_20d", "type": "categorical"},
+    {"id": 6, "name": "Intraday_overnight", "source": "yz_cc_comparison", "type": "categorical"},
+    {"id": 7, "name": "Front_Back_RV_20d", "source": "YZ_spread_20d", "type": "term_structure"},
+    {"id": 8, "name": "Front_Back_RV_5d", "source": "YZ_spread_5d", "type": "term_structure"},
+    {"id": 9, "name": "F0_F1_asymmetry_regime", "source": "semivar F0 vs F1", "type": "regime"},
+    {"id": 10, "name": "Downside_asymmetry_20d", "source": "semivar_down/up_20d", "type": "strength"},
+    {"id": 11, "name": "Downside_asymmetry_5d", "source": "semivar_down/up_5d", "type": "strength"},
+    {"id": 12, "name": "Gap_frequency_regime", "source": "gap_analysis.frequency_pct", "type": "categorical"},
+    {"id": 13, "name": "Gap_tail_risk", "source": "gap_quantiles.p90", "type": "risk_level"},
+    {"id": 14, "name": "RV_Forecast_gate", "source": "rv_forecast vs YZ_20d", "type": "sufficiency"},
+    {"id": 15, "name": "F2_reliability", "source": "f2_reliability_label", "type": "categorical"},
+    {"id": 16, "name": "F2_vol_ratio", "source": "volume_ratio_historical.z", "type": "execution_risk"},
+    {"id": 17, "name": "Basis_vol", "source": "basis_vol_20d", "type": "categorical"},
+    {"id": 18, "name": "Samuelson_position", "source": "samuelson_status", "type": "categorical"}
+  ],
+  "_output_rule": "each factor: status + 1-sentence interpretation + JSON source"
+}
+
+STEP-4: ASYMMETRY-FLIP-ANALYSIS (Enhanced)
+
+{
+  "_step": 4,
+  "_critical": true,
+  "calculation": {
+    "F0_20d": "F0_semivar_down_20d / F0_semivar_up_20d",
+    "F1_20d": "F1_semivar_down_20d / F1_semivar_up_20d",
+    "F1_5d": "F1_semivar_down_5d / F1_semivar_up_5d"
+  },
+  "classification": {
+    "flip_upside_to_downside": "F0_ratio < 0.9 AND F1_ratio > 1.1",
+    "flip_downside_to_upside": "F0_ratio > 1.1 AND F1_ratio < 0.9",
+    "continuous": "both ratios same side of 1.0",
+    "escalation": "same direction, F1_ratio > F0_ratio by >0.2"
+  },
+  "strategic_implications": {
+    "flip_downside": "strongest BWB put signal",
+    "flip_upside": "strongest BWB call signal", 
+    "continuous_downside": "confirmed trend",
+    "escalation": "increasing conviction"
+  }
+}
+
+STEP-5: GAP-MICROSTRUCTURE (Enhanced v4.0)
+
+{
+  "_step": 5,
+  "_enhanced": true,
+  "frequency_analysis": {
+    "F0_F1_F2_comparison": "escalation detection",
+    "rollover_artifact_check": "F1_5d_freq / F0_5d_freq > 5x → temporary regime",
+    "consistency_check": "gap_60d = 0 with non-zero gap_5d/20d → recent regime, unknown persistence"
+  },
+  "clustering_analysis": {
+    "autocorr_lag1": "gap_analysis.*.gap_clustering.autocorr_lag1",
+    "classification": {
+      "negative_clustering": [-1, -0.1],
+      "low_clustering": [-0.1, 0.1],
+      "moderate_clustering": [0.1, 0.25],
+      "high_clustering": [0.25, 1]
+    },
+    "trading_implication": {
+      "high_clustering": "gaps cluster in series → avoid naked short gamma overnight",
+      "moderate_clustering": "weak serial correlation → moderate hedge",
+      "low_clustering": "independent gaps → standard risk management",
+      "negative_clustering": "mean reversion likely → favor overnight short gamma"
+    }
+  },
+  "amplitude_trend": {
+    "ratio_5d_60d": "gap_regime_analysis.metrics.amplitude_ratio_5d_60d",
+    "interpretation": {
+      "compressing": [0, 0.8, "frequent small gaps → Condor-friendly"],
+      "stable": [0.8, 1.2, "normal amplitude"],
+      "expanding": [1.2, 999, "tail risk growing → BWB/Vertical only"]
+    }
+  },
+  "strike_benchmark": {
+    "source": "gap_analysis.F1_current.20d.gap_quantiles",
+    "Iron_Condor": {"short": "p90", "protective": "p95"},
+    "Iron_Butterfly": {"short": "p90", "protective": null},
+    "BWB": {"short": "p90", "protective": "p95_mandatory"},
+    "Calendar": {"overnight_proxy": "p50"}
+  },
+  "intraday_overnight": {
+    "detection": "CC vs YZ comparison",
+    "intraday_excess": "CC > YZ → enter near session close",
+    "overnight_excess": "YZ > CC → standard timing"
+  }
+}
+
+STEP-6: DISTRIBUTION-VoV-SYNTHESIS
+
+{
+  "_step": 6,
+  "skew_dynamics": {
+    "5d_vs_20d_vs_60d": "trend detection",
+    "recent_vs_structural": "skew_60d ≈ 0 with skew_5d << 0 → recent bias"
+  },
+  "kurtosis_strict_interpretation": {
+    "platykurtic": "tail events less frequent → moderate short-vol positive, NOT 'market safe'",
+    "leptokurtic": "fat tails realized → short-vol negative",
+    "stability": "both 5d and 20d negative → stable platykurtic"
+  },
+  "composite_matrix": {
+    "Left_skew_platykurtic": "BWB moderately supported; Condor widen put-wing",
+    "Left_skew_leptokurtic": "BWB needs wide wing; Condor dangerous",
+    "Symmetric_platykurtic": "classic Condor regime",
+    "Symmetric_leptokurtic": "Butterfly/Condor dangerous; wide wings needed",
+    "Right_skew_any": "Call-side bias; check 20d/60d stability"
+  },
+  "VoV_timing": {
+    "extreme_VoV": ">0.40 → defer entry until <0.35",
+    "stable_VoV": "standard calendar rule (Fri-Tue)",
+    "intraday_excess_override": "enter near session close"
+  }
+}
+
+STEP-7: RV-FORECAST-STRICT
+
+{
+  "_step": 7,
+  "_hard_gates": true,
+  "forecast_vs_current": {
+    "HAR_forecast": "primary (multi-horizon persistence)",
+    "EWMA_forecast": "secondary",
+    "consensus": "mild_disagreement/significant/EWMA_higher/HAR_higher"
+  },
+  "premium_sufficiency_gate": {
+    "minimum_ATM_IV": "forecast_RV + 1.5pp",
+    "classification": {
+      "insufficient": [0, 0.5],
+      "marginal": [0.5, 1.5],
+      "sufficient": [1.5, 999]
+    },
+    "absolute_constraint": "no short-vega strategy can bypass this gate"
+  },
+  "F1_F2_identity_check": {
+    "condition": "forecast_RV F1 == forecast_RV F2",
+    "implication": "model fails to differentiate term structure → Calendar kill at RV level",
+    "warning": "methodological EWMA limitation"
+  },
+  "session_specific_samuelson": {
+    "nearest_thu_fractional_DTE": "use Samuelson DTE table if < 10",
+    "current_YZ_vs_DTE_mean": "cheap/rich assessment for weeklies"
+  }
+}
+
+STEP-8: STRATEGY-RANKING-STRICT
+
+{
+  "_step": 8,
+  "_output": "status_table + detailed_favored",
+  "status_matrix": {
+    "Iron_Condor": {
+      "green": "elevated vol + cooling + symmetric + platykurtic/normal + absent/mild asymmetry",
+      "yellow": "elevated vol + cooling + moderate asymmetry → widen put-wing",
+      "red": "strong asymmetry OR leptokurtic OR extreme VoV OR accelerating vol (ROC_5d > 30%)"
+    },
+    "Iron_Butterfly": {
+      "green": "very elevated vol + strong cooling + stable VoV + platykurtic/normal + symmetric",
+      "yellow": "elevated vol + cooling + elevated VoV + moderate asymmetry",
+      "red": "extreme VoV OR strong asymmetry OR low vol OR F2 reduced"
+    },
+    "BWB": {
+      "green": "moderate/strong asymmetry (ratio > 1.3 on 20d OR semivar_up_5d = 0) + elevated vol + flip or continuous_downside",
+      "yellow": "mild asymmetry (1.1-1.3) + elevated vol",
+      "red": "absent asymmetry + symmetric OR low vol OR right skew"
+    },
+    "Debit_Vertical": {
+      "green": "low/normal vol + accelerating + complacent Samuelson + leptokurtic",
+      "yellow": "normal vol + stable + directional skew",
+      "red": "elevated vol + cooling OR extreme VoV OR platykurtic"
+    },
+    "Calendar": {
+      "green": "RV contango (YZ_spread_20d < 0) + F2 adequate + low basis_vol + forecast_F1 ≠ F2 + volume_z > -1.5",
+      "yellow": "neutral term structure + F2 adequate + elevated basis_vol",
+      "red": "RV backwardation OR F2 reduced OR high basis_vol OR forecast_F1 = F2 OR volume_z < -1.5"
+    }
+  },
+  "detailed_favored_template": {
+    "Realized_Edge_Primary": "thesis + numbers",
+    "Realized_Edge_Secondary": "kurtosis/VoV/continuity",
+    "Vomma_Risk": "level + VoV_5d value",
+    "Strike_Guidance": "short ≥ p90%, wing ≥ p95%, p50 = X%",
+    "Key_Risk_pre_entry": "what breaks thesis before entry",
+    "Key_Risk_post_entry": "what breaks thesis after entry",
+    "Entry": "day + VoV adjustment + intraday adjustment",
+    "Kill_conditions": ["asymmetry ratio < 1.1", "ROC reversal > +10% (5d)", "VoV_5d > 0.40", "gap_freq_5d > 7%"]
+  }
+}
+
+STEP-9: DATA-WARNINGS-COMPLETE
+
+{
+  "_step": 9,
+  "null_fields_registry": {
+    "field": "name",
+    "impact": "analysis impact",
+    "proxy_used": "if any"
+  },
+  "reliability_warnings": {
+    "F2_reliability": "status + per-strategy impact",
+    "Samuelson_table": "low reliability n=10-11, DTE < 10 only",
+    "JSON_contradictions": "field winner + reasoning"
+  },
+  "structural_warnings": {
+    "Vomma_Risk": "VoV_5d > 0.40",
+    "Gap_regime_recent": "gap_60d = 0 with non-zero shorter horizons",
+    "Forecast_identity": "F1 = F2 forecast",
+    "F2_gap_artifact": "F2_freq >> F1_freq with reduced reliability",
+    "ROC_divergence": "YZ_5d ROC vs YZ_20d ROC opposite signs"
+  }
+}
+
+STEP-10: IV-THRESHOLDS-BLOCK-4
+
+{
+  "_step": 10,
+  "per_strategy_template": {
+    "activation": "ATM IV NEAR > X% + condition",
+    "optimal_zone": "X%-Y% + skew/greek conditions",
+    "deactivation": "ATM IV < Z% OR other condition",
+    "premium_gate": "ATM IV > forecast_RV + 1.5pp (hard minimum)",
+    "strike_guidance": "from gap_quantiles F1 20d"
+  },
+  "mandatory_block4_checks": [
+    "IV - forecast_RV ≥ 1.5pp",
+    "Put skew confirms realized downside asymmetry (for BWB)",
+    "IV term structure contango/backwardation (for Calendar)",
+    "Greeks: theta/vega ratio sufficient for chosen DTE"
+  ]
+}
+
+FORMAT-OUTPUT-TEMPLATE
+
+## Si Realized Vol Analysis — {date} ({day_of_week})
+### F1={ticker} (DTE {n}) | F2={ticker} (DTE {n})
+
+### 1. Режим и Контекст
+[5 sentences max: level + ROC dynamics + VoV regime + contradictions]
+
+&gt; ⚠️ Vomma Risk: [LEVEL] [if VoV_5d &gt; 0.40]
+
+### 2. Samuelson & Continuity
+[status + deviation + F0→F1 change pp + flip/continuous]
+
+### 3. Signal Matrix
+[18 factors table with JSON sources]
+
+### 4. F0→F1 Asymmetry & Regime Continuity
+[semivar ratios + classification + implications]
+
+### 5. Gap Microstructure & Strike Benchmark
+[frequency shift + clustering analysis + amplitude trend + strike table + intraday/overnight]
+
+### 6. Return Distribution & VoV Synthesis
+[skew dynamics + kurtosis strict + composite + timing]
+
+### 7. RV Forecast Analysis
+[forecast vs current + premium gate + F1/F2 identity + session Samuelson]
+
+### 8. Strategy Ranking
+[5-strategy table]
+
+#### 🟢 Favored: [Name]
+[detailed template from step 8]
+
+### 9. Data Warnings
+[null fields + reliability + structural]
+
+### 10. IV Thresholds for Block 4
+[per-strategy + mandatory checks]
+
+FINAL-CONSTRAINTS
+
+{
+  "_language": "Russian, except option terms/metrics/tickers",
+  "_no_interpolation": "null fields remain null, no assumptions",
+  "_calculation_priority": "ROC/semivar/spread/gap_quantiles override all labels",
+  "_risk_first": "kill conditions evaluated before entry conditions",
+  "_dynamic_static_balance": "ROC momentum can override favorable static metrics",
+  "_flip_detection_mandatory": "F0→F1 asymmetry direction change must be explicit"
+}
+
