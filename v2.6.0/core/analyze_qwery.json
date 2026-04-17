@@ -1,0 +1,1062 @@
+{
+  "meta": {
+    "schema_version": "2.6.0",
+    "engine_version": "dual_vol_engine_0.6.0",
+    "calculation_id": "dualvol_si_2026-04-16_vd5aee1",
+    "timezone": "Europe/Moscow",
+    "query_date": "2026-04-16",
+    "generated_at": "2026-04-16T10:52:17.468129+00:00"
+  },
+  "contracts": {
+    "F0_expired": {
+      "ticker": "SiH6",
+      "expiry": "2026-03-19",
+      "days_since_expiry": 28
+    },
+    "F1_current": {
+      "ticker": "SiM6",
+      "expiry": "2026-06-18",
+      "days_to_expiry": 63
+    },
+    "F2_next": {
+      "ticker": "SiU6",
+      "expiry": "2026-09-17",
+      "days_to_expiry": 154
+    }
+  },
+  "volume_analysis": {
+    "avg_volume_5d_F1": 1254946.2,
+    "volume_ratio_f1_f2": 28.8574,
+    "activity_weight_F1": 1.0,
+    "f2_reliability_label": "adequate"
+  },
+  "gap_regime_analysis": {
+    "emerging": true,
+    "regime_type": "gradual_buildup",
+    "confidence": "low-medium",
+    "severity": "low",
+    "persistence_estimate": "uncertain, monitor next 5-10 days",
+    "metrics": {
+      "gap_5d": 10.2,
+      "gap_20d": 7.7,
+      "gap_60d": 4.0,
+      "ratio_5d_to_20d": 1.32,
+      "ratio_20d_to_60d": 1.93,
+      "acceleration_vs_60d": 2.55,
+      "percentile_rank_5d_vs_60d": 100.0,
+      "amplitude_avg_5d": 0.012274,
+      "amplitude_avg_60d": 0.01694,
+      "amplitude_ratio_5d_60d": 0.72,
+      "gap_clustering_autocorr": 0.086,
+      "gap_clustering_label": "low_clustering",
+      "directional_bias_label": "symmetric",
+      "up_gap_freq_5d": 5.8,
+      "down_gap_freq_5d": 4.5
+    },
+    "reason": "gap_5d=10.2% vs gap_20d=7.7% vs gap_60d=4.0% (acceleration=2.5×)",
+    "interpretation": "Постепенное нарастание гэпов (5d>20d>60d): плавный градиент 10.2%→7.7%→4.0%. Формирующийся тренд, требует мониторинга.",
+    "affected_strategies": [
+      "Iron Condor",
+      "Short Straddle",
+      "BWB"
+    ],
+    "recommendation": "Monitor position sizing",
+    "enhanced_analysis": {
+      "clustering": "Low clustering: gaps are independent events.",
+      "amplitude": "Gap amplitude stable vs 60d baseline.",
+      "directional_bias": "Symmetric gaps: no directional preference."
+    },
+    "llm_hint": "Emerging gap regime detected: type='gradual_buildup', confidence=low-medium, severity=low. Percentile rank=100th (5d vs 60d distribution). Low clustering: gaps are independent events. Symmetric gaps: no directional preference."
+  },
+  "data_quality": {
+    "warnings": [
+      {
+        "code": "GAP_REGIME_EMERGING",
+        "severity": "info",
+        "message": "Emerging gap regime detected: type='gradual_buildup' (confidence=low-medium, severity=low). Gap frequencies: 5d=10.2%, 20d=7.7%, 60d=4.0%. Постепенное нарастание гэпов (5d>20d>60d): плавный градиент 10.2%→7.7%→4.0%. Формирующийся тренд, требует мониторинга.",
+        "affected_strategies": [
+          "Iron Condor",
+          "Short Straddle",
+          "BWB"
+        ],
+        "regime_details": {
+          "emerging": true,
+          "regime_type": "gradual_buildup",
+          "confidence": "low-medium",
+          "severity": "low",
+          "persistence_estimate": "uncertain, monitor next 5-10 days",
+          "metrics": {
+            "gap_5d": 10.2,
+            "gap_20d": 7.7,
+            "gap_60d": 4.0,
+            "ratio_5d_to_20d": 1.32,
+            "ratio_20d_to_60d": 1.93,
+            "acceleration_vs_60d": 2.55,
+            "percentile_rank_5d_vs_60d": 100.0,
+            "amplitude_avg_5d": 0.012274,
+            "amplitude_avg_60d": 0.01694,
+            "amplitude_ratio_5d_60d": 0.72,
+            "gap_clustering_autocorr": 0.086,
+            "gap_clustering_label": "low_clustering",
+            "directional_bias_label": "symmetric",
+            "up_gap_freq_5d": 5.8,
+            "down_gap_freq_5d": 4.5
+          },
+          "reason": "gap_5d=10.2% vs gap_20d=7.7% vs gap_60d=4.0% (acceleration=2.5×)",
+          "interpretation": "Постепенное нарастание гэпов (5d>20d>60d): плавный градиент 10.2%→7.7%→4.0%. Формирующийся тренд, требует мониторинга.",
+          "affected_strategies": [
+            "Iron Condor",
+            "Short Straddle",
+            "BWB"
+          ],
+          "recommendation": "Monitor position sizing",
+          "enhanced_analysis": {
+            "clustering": "Low clustering: gaps are independent events.",
+            "amplitude": "Gap amplitude stable vs 60d baseline.",
+            "directional_bias": "Symmetric gaps: no directional preference."
+          },
+          "llm_hint": "Emerging gap regime detected: type='gradual_buildup', confidence=low-medium, severity=low. Percentile rank=100th (5d vs 60d distribution). Low clustering: gaps are independent events. Symmetric gaps: no directional preference."
+        }
+      }
+    ],
+    "aligned_bars_f1_f2": 355
+  },
+  "volatility": {
+    "F0_expired": {
+      "YZ_5d": {
+        "value": null,
+        "available": false,
+        "reason": "F0_expired_5d_stale"
+      },
+      "CC_5d": {
+        "value": null,
+        "available": false,
+        "reason": "F0_expired_5d_stale"
+      },
+      "YZ_20d": 0.14254,
+      "CC_20d": 0.15112,
+      "skew_20d": -0.3076,
+      "kurtosis_20d": -1.199,
+      "vol_of_vol_20d": 0.004789,
+      "YZ_60d": 0.144877,
+      "CC_60d": 0.150574,
+      "skew_60d": -0.0888,
+      "kurtosis_60d": -0.589,
+      "vol_of_vol_60d": 0.003628,
+      "YZ_250d": 0.136092,
+      "CC_250d": 0.134268,
+      "semivar_down_5d": {
+        "value": null,
+        "available": false,
+        "reason": "F0_expired_5d_stale"
+      },
+      "semivar_up_5d": {
+        "value": null,
+        "available": false,
+        "reason": "F0_expired_5d_stale"
+      },
+      "semivar_down_20d": 0.050866,
+      "semivar_up_20d": 0.086656
+    },
+    "F1_current": {
+      "YZ_5d": 0.156139,
+      "CC_5d": 0.171387,
+      "skew_5d": 0.1972,
+      "kurtosis_5d": -2.31,
+      "vol_of_vol_5d": 0.022766,
+      "YZ_20d": 0.15639,
+      "CC_20d": 0.150301,
+      "skew_20d": 0.2908,
+      "kurtosis_20d": -0.996,
+      "vol_of_vol_20d": 0.003769,
+      "YZ_60d": 0.147042,
+      "CC_60d": 0.14533,
+      "skew_60d": -0.0287,
+      "kurtosis_60d": -0.823,
+      "vol_of_vol_60d": 0.022297,
+      "YZ_250d": 0.156051,
+      "CC_250d": 0.12952,
+      "semivar_down_5d": 0.073542,
+      "semivar_up_5d": 0.026001,
+      "semivar_down_20d": 0.089838,
+      "semivar_up_20d": 0.065965
+    },
+    "F2_next": {
+      "YZ_5d": 0.153114,
+      "CC_5d": 0.175957,
+      "skew_5d": 0.2726,
+      "kurtosis_5d": -2.103,
+      "vol_of_vol_5d": 0.020067,
+      "YZ_20d": 0.151631,
+      "CC_20d": 0.144042,
+      "skew_20d": 0.2227,
+      "kurtosis_20d": -1.147,
+      "vol_of_vol_20d": 0.004177,
+      "YZ_60d": 0.14081,
+      "CC_60d": 0.138899,
+      "skew_60d": 0.1477,
+      "kurtosis_60d": -0.563,
+      "vol_of_vol_60d": 0.020844,
+      "YZ_250d": 0.151742,
+      "CC_250d": 0.130843,
+      "semivar_down_5d": 0.074171,
+      "semivar_up_5d": 0.047523,
+      "semivar_down_20d": 0.083674,
+      "semivar_up_20d": 0.068271
+    }
+  },
+  "samuelson_daily_short": {
+    "DTE_1": {
+      "mean_vol": 0.26572,
+      "std_bucket": 0.26572,
+      "p10": 0.019643,
+      "p90": 0.357561,
+      "n_obs": 11,
+      "reliability": "low",
+      "llm_hint": "Historical vol norm for DTE=1. Use for tenor-matched IV comparison."
+    },
+    "DTE_2": {
+      "mean_vol": 0.165077,
+      "std_bucket": 0.165077,
+      "p10": 0.043255,
+      "p90": 0.262527,
+      "n_obs": 11,
+      "reliability": "low",
+      "llm_hint": "Historical vol norm for DTE=2. Use for tenor-matched IV comparison."
+    },
+    "DTE_3": {
+      "mean_vol": 0.215609,
+      "std_bucket": 0.215609,
+      "p10": 0.004237,
+      "p90": 0.29158,
+      "n_obs": 11,
+      "reliability": "low",
+      "llm_hint": "Historical vol norm for DTE=3. Use for tenor-matched IV comparison."
+    },
+    "DTE_4": {
+      "mean_vol": 0.184542,
+      "std_bucket": 0.092271,
+      "p10": 0.055363,
+      "p90": 0.276813,
+      "n_obs": 0,
+      "reliability": "interpolated",
+      "llm_hint": "Interpolated between DTE_3 and DTE_6. Use with caution.",
+      "interpolation_note": "Linear interpolation: (3→6), no historical observations"
+    },
+    "DTE_5": {
+      "mean_vol": 0.153476,
+      "std_bucket": 0.076738,
+      "p10": 0.046043,
+      "p90": 0.230213,
+      "n_obs": 0,
+      "reliability": "interpolated",
+      "llm_hint": "Interpolated between DTE_4 and DTE_6. Use with caution.",
+      "interpolation_note": "Linear interpolation: (4→6), no historical observations"
+    },
+    "DTE_6": {
+      "mean_vol": 0.122409,
+      "std_bucket": 0.122409,
+      "p10": 0.0074,
+      "p90": 0.187109,
+      "n_obs": 11,
+      "reliability": "low",
+      "llm_hint": "Historical vol norm for DTE=6. Use for tenor-matched IV comparison."
+    },
+    "DTE_7": {
+      "mean_vol": 0.10546,
+      "std_bucket": 0.10546,
+      "p10": 0.038606,
+      "p90": 0.138813,
+      "n_obs": 10,
+      "reliability": "low",
+      "llm_hint": "Historical vol norm for DTE=7. Use for tenor-matched IV comparison."
+    },
+    "DTE_8": {
+      "mean_vol": 0.148005,
+      "std_bucket": 0.148005,
+      "p10": 0.042445,
+      "p90": 0.303501,
+      "n_obs": 10,
+      "reliability": "low",
+      "llm_hint": "Historical vol norm for DTE=8. Use for tenor-matched IV comparison."
+    },
+    "DTE_9": {
+      "mean_vol": 0.176948,
+      "std_bucket": 0.176948,
+      "p10": 0.030447,
+      "p90": 0.243772,
+      "n_obs": 11,
+      "reliability": "low",
+      "llm_hint": "Historical vol norm for DTE=9. Use for tenor-matched IV comparison."
+    },
+    "DTE_10": {
+      "mean_vol": 0.249028,
+      "std_bucket": 0.249028,
+      "p10": 0.047699,
+      "p90": 0.434864,
+      "n_obs": 11,
+      "reliability": "low",
+      "llm_hint": "Historical vol norm for DTE=10. Use for tenor-matched IV comparison."
+    },
+    "methodology": "Daily aggregation. Shrinkage applied for n<10. Linear interpolation for missing DTE.",
+    "llm_hint": "Compare current IV(DTE) with mean_vol. If IV > p90, short vol has strong edge. Interpolated values marked explicitly."
+  },
+  "rv_forecast_session_aligned": {
+    "to_nearest_thu_1845": {
+      "EWMA_forecast": {
+        "target_datetime": "2026-04-23T18:45:00",
+        "fractional_trading_days": 9.14,
+        "forecast_RV": 0.16181,
+        "method": "fractional_EWMA_interpolated",
+        "llm_hint": "Compare with ATM_IV of matching DTE. If IV − Forecast_RV < 1.5pp, premium insufficient for short-vega.",
+        "available": true
+      },
+      "HAR_forecast": {
+        "forecast_RV": 0.156214,
+        "method": "HAR-RV",
+        "coefficients": {
+          "beta_daily": 0.3,
+          "beta_weekly": 0.4,
+          "beta_monthly": 0.3
+        },
+        "components": {
+          "RV_1d": 0.156139,
+          "RV_5d_avg": 0.156139,
+          "RV_20d_avg": 0.15639
+        },
+        "horizon_days": 7.36,
+        "gap_filtered": false,
+        "method_note": "HAR-RV (Corsi 2009) with horizon-adaptive weights",
+        "available": true
+      },
+      "HAR_vs_EWMA_spread_pp": -0.5596,
+      "forecast_consensus": "mild_disagreement",
+      "recommended_forecast": 0.156214,
+      "target_datetime": "2026-04-23T18:45:00",
+      "fractional_trading_days": 9.14,
+      "forecast_RV": 0.156214,
+      "available": true
+    },
+    "to_next_thu_1845": {
+      "EWMA_forecast": {
+        "target_datetime": "2026-04-30T18:45:00",
+        "fractional_trading_days": 16.14,
+        "forecast_RV": 0.16132,
+        "method": "fractional_EWMA_interpolated",
+        "llm_hint": "Compare with ATM_IV of matching DTE. If IV − Forecast_RV < 1.5pp, premium insufficient for short-vega.",
+        "available": true
+      },
+      "HAR_forecast": {
+        "forecast_RV": 0.156239,
+        "method": "HAR-RV",
+        "coefficients": {
+          "beta_daily": 0.25,
+          "beta_weekly": 0.35,
+          "beta_monthly": 0.4
+        },
+        "components": {
+          "RV_1d": 0.156139,
+          "RV_5d_avg": 0.156139,
+          "RV_20d_avg": 0.15639
+        },
+        "horizon_days": 14.36,
+        "gap_filtered": false,
+        "method_note": "HAR-RV (Corsi 2009) with horizon-adaptive weights",
+        "available": true
+      },
+      "HAR_vs_EWMA_spread_pp": -0.5081,
+      "forecast_consensus": "mild_disagreement",
+      "recommended_forecast": 0.156239,
+      "target_datetime": "2026-04-30T18:45:00",
+      "fractional_trading_days": 16.14,
+      "forecast_RV": 0.156239,
+      "available": true
+    },
+    "llm_hint": "HAR-RV forecast captures multi-horizon vol persistence better than EWMA. If HAR > EWMA by >1.5pp, market participants expect vol expansion. Use 'recommended_forecast' for IV edge analysis."
+  },
+  "volume_ratio_historical": {
+    "current_ratio_pct": 3.5,
+    "historical_avg_pct": 3.6,
+    "historical_std_pct": 2.5,
+    "z_vs_history": -0.04,
+    "interpretation": "F2 объём = 3.5% от F1 (в пределах нормы, ист.ср=3.6%, z=-0.04)",
+    "note": "DTE≈63/154, окно=5д, допуск±5д",
+    "llm_hint": "Use z_vs_history for liquidity context. z<-1.5 implies execution risk for calendars/BWB."
+  },
+  "regime_classification": {
+    "level": "normal",
+    "dynamics": "stable",
+    "composite": "normal_stable",
+    "note": ""
+  },
+  "semivar_asymmetry": {
+    "F1_5d": {
+      "label": "strong_downside_bias",
+      "down_up_ratio": 2.8284,
+      "semivar_n_down": 3,
+      "semivar_n_up": 2,
+      "available": true
+    },
+    "F1_20d": {
+      "label": "moderate_downside_bias",
+      "down_up_ratio": 1.3619,
+      "semivar_n_down": 14,
+      "semivar_n_up": 6,
+      "available": true
+    },
+    "F2_5d": {
+      "label": "moderate_downside_bias",
+      "down_up_ratio": 1.5607,
+      "semivar_n_down": 3,
+      "semivar_n_up": 2,
+      "available": true
+    },
+    "F2_20d": {
+      "label": "mild_downside_bias",
+      "down_up_ratio": 1.2256,
+      "semivar_n_down": 13,
+      "semivar_n_up": 7,
+      "available": true
+    },
+    "note": "Ratio>=1.3=asymmetry. semivar_up=0→extreme_downside. Affects put-skew."
+  },
+  "rate_of_change": {
+    "F1_YZ_5d_roc_5d_pct": 54.8,
+    "F1_YZ_5d_roc_10d_pct": 1.7,
+    "F1_YZ_5d_roc_20d_pct": -7.6,
+    "F1_YZ_20d_roc_5d_pct": -4.2,
+    "F1_YZ_20d_roc_10d_pct": -6.4,
+    "F1_YZ_20d_roc_20d_pct": 1.6,
+    "momentum_5d_vs_20d": "accelerating_warming"
+  },
+  "state_labels": {
+    "front_vs_next_vol": "front_richer",
+    "front_specific_stress": "normal",
+    "downside_asymmetry": "present",
+    "f2_reliability": "adequate",
+    "vol_regime": "normal_stable",
+    "samuelson_status": "normal_for_dte",
+    "samuelson_z_score": null,
+    "samuelson_deviation_pp": null,
+    "vol_trend": "warming",
+    "calendar_rv_direction": "backwardation",
+    "basis_vol_label": "elevated"
+  },
+  "distribution_classification": {
+    "F1_skew_5d": "symmetric",
+    "F1_skew_20d": "symmetric",
+    "F1_kurtosis_5d": "platykurtic",
+    "F1_kurtosis_20d": "normal"
+  },
+  "gap_analysis": {
+    "F0_expired": {
+      "5d": {
+        "frequency_pct": 0.8,
+        "amplitude_avg": 0.00811,
+        "amplitude_max": 0.00847,
+        "gap_quantiles": {
+          "p10": 0.007823,
+          "p25": 0.00793,
+          "p50": 0.00811,
+          "p75": 0.00829,
+          "p90": 0.008398,
+          "p95": 0.008434
+        },
+        "n_gaps": 2,
+        "gap_sigma_distribution": {
+          "0.0-0.25σ": {
+            "count": 199,
+            "frequency_pct": 79.9,
+            "amplitude_avg": 0.000444,
+            "amplitude_max": 0.002782,
+            "amplitude_p90": 0.001003
+          },
+          "0.25-0.5σ": {
+            "count": 38,
+            "frequency_pct": 15.3,
+            "amplitude_avg": 0.002507,
+            "amplitude_max": 0.005008,
+            "amplitude_p90": 0.003789
+          },
+          "0.5-0.75σ": {
+            "count": 8,
+            "frequency_pct": 3.2,
+            "amplitude_avg": 0.004301,
+            "amplitude_max": 0.007908,
+            "amplitude_p90": 0.006924
+          },
+          "0.75-1.0σ": {
+            "count": 2,
+            "frequency_pct": 0.8,
+            "amplitude_avg": 0.004997,
+            "amplitude_max": 0.007813,
+            "amplitude_p90": 0.00725
+          },
+          "≥1.0σ": {
+            "count": 2,
+            "frequency_pct": 0.8,
+            "amplitude_avg": 0.00811,
+            "amplitude_max": 0.00847,
+            "amplitude_p90": 0.008398
+          }
+        },
+        "rolling_std_mean": 0.007755,
+        "available": true,
+        "gap_clustering": {
+          "autocorr_lag1": -0.008,
+          "interpretation": "negative_clustering",
+          "llm_hint": "Gaps are independent: no serial pattern"
+        },
+        "directional_bias": {
+          "up_gap_frequency_pct": 0.4,
+          "down_gap_frequency_pct": 0.4,
+          "up_gap_count": 1,
+          "down_gap_count": 1,
+          "bias_label": "symmetric",
+          "llm_hint": "Symmetric gaps: no directional preference"
+        }
+      },
+      "20d": {
+        "frequency_pct": 0.4,
+        "amplitude_avg": 0.00847,
+        "amplitude_max": 0.00847,
+        "gap_quantiles": {
+          "p10": 0.00847,
+          "p25": 0.00847,
+          "p50": 0.00847,
+          "p75": 0.00847,
+          "p90": 0.00847,
+          "p95": 0.00847
+        },
+        "n_gaps": 1,
+        "gap_sigma_distribution": {
+          "0.0-0.25σ": {
+            "count": 202,
+            "frequency_pct": 86.3,
+            "amplitude_avg": 0.000484,
+            "amplitude_max": 0.002575,
+            "amplitude_p90": 0.001105
+          },
+          "0.25-0.5σ": {
+            "count": 25,
+            "frequency_pct": 10.7,
+            "amplitude_avg": 0.002898,
+            "amplitude_max": 0.004415,
+            "amplitude_p90": 0.003984
+          },
+          "0.5-0.75σ": {
+            "count": 4,
+            "frequency_pct": 1.7,
+            "amplitude_avg": 0.003447,
+            "amplitude_max": 0.005008,
+            "amplitude_p90": 0.00475
+          },
+          "0.75-1.0σ": {
+            "count": 2,
+            "frequency_pct": 0.9,
+            "amplitude_avg": 0.007829,
+            "amplitude_max": 0.007908,
+            "amplitude_p90": 0.007893
+          },
+          "≥1.0σ": {
+            "count": 1,
+            "frequency_pct": 0.4,
+            "amplitude_avg": 0.00847,
+            "amplitude_max": 0.00847,
+            "amplitude_p90": 0.00847
+          }
+        },
+        "rolling_std_mean": 0.008106,
+        "available": true,
+        "gap_clustering": {
+          "autocorr_lag1": -0.004,
+          "interpretation": "negative_clustering",
+          "llm_hint": "Gaps are independent: no serial pattern"
+        },
+        "directional_bias": {
+          "up_gap_frequency_pct": 0.0,
+          "down_gap_frequency_pct": 0.4,
+          "up_gap_count": 0,
+          "down_gap_count": 1,
+          "bias_label": "symmetric",
+          "llm_hint": "Symmetric gaps: no directional preference"
+        }
+      },
+      "60d": {
+        "frequency_pct": 0.0,
+        "amplitude_avg": 0.0,
+        "amplitude_max": 0.0,
+        "gap_quantiles": {
+          "p10": 0.0,
+          "p25": 0.0,
+          "p50": 0.0,
+          "p75": 0.0,
+          "p90": 0.0,
+          "p95": 0.0
+        },
+        "n_gaps": 0,
+        "gap_sigma_distribution": {
+          "0.0-0.25σ": {
+            "count": 184,
+            "frequency_pct": 94.8,
+            "amplitude_avg": 0.00042,
+            "amplitude_max": 0.001649,
+            "amplitude_p90": 0.000941
+          },
+          "0.25-0.5σ": {
+            "count": 10,
+            "frequency_pct": 5.2,
+            "amplitude_avg": 0.002247,
+            "amplitude_max": 0.002755,
+            "amplitude_p90": 0.002677
+          },
+          "0.5-0.75σ": {
+            "count": 0,
+            "frequency_pct": 0.0
+          },
+          "0.75-1.0σ": {
+            "count": 0,
+            "frequency_pct": 0.0
+          },
+          "≥1.0σ": {
+            "count": 0,
+            "frequency_pct": 0.0
+          }
+        },
+        "rolling_std_mean": 0.008034,
+        "available": true,
+        "gap_clustering": {
+          "autocorr_lag1": 0.0,
+          "interpretation": "low_clustering",
+          "llm_hint": "Gaps are independent: no serial pattern"
+        },
+        "directional_bias": {
+          "up_gap_frequency_pct": 0.0,
+          "down_gap_frequency_pct": 0.0,
+          "up_gap_count": 0,
+          "down_gap_count": 0,
+          "bias_label": "symmetric",
+          "llm_hint": "Symmetric gaps: no directional preference"
+        }
+      }
+    },
+    "F1_current": {
+      "5d": {
+        "frequency_pct": 10.2,
+        "amplitude_avg": 0.012274,
+        "amplitude_max": 0.035894,
+        "gap_quantiles": {
+          "p10": 0.005335,
+          "p25": 0.006674,
+          "p50": 0.009469,
+          "p75": 0.016262,
+          "p90": 0.022863,
+          "p95": 0.026851
+        },
+        "n_gaps": 39,
+        "gap_sigma_distribution": {
+          "0.0-0.25σ": {
+            "count": 213,
+            "frequency_pct": 55.9,
+            "amplitude_avg": 0.000718,
+            "amplitude_max": 0.005032,
+            "amplitude_p90": 0.001652
+          },
+          "0.25-0.5σ": {
+            "count": 58,
+            "frequency_pct": 15.2,
+            "amplitude_avg": 0.003266,
+            "amplitude_max": 0.009931,
+            "amplitude_p90": 0.005753
+          },
+          "0.5-0.75σ": {
+            "count": 39,
+            "frequency_pct": 10.2,
+            "amplitude_avg": 0.005487,
+            "amplitude_max": 0.017525,
+            "amplitude_p90": 0.008947
+          },
+          "0.75-1.0σ": {
+            "count": 32,
+            "frequency_pct": 8.4,
+            "amplitude_avg": 0.008401,
+            "amplitude_max": 0.025287,
+            "amplitude_p90": 0.012488
+          },
+          "≥1.0σ": {
+            "count": 39,
+            "frequency_pct": 10.2,
+            "amplitude_avg": 0.012274,
+            "amplitude_max": 0.035894,
+            "amplitude_p90": 0.022863
+          }
+        },
+        "rolling_std_mean": 0.008926,
+        "available": true,
+        "gap_clustering": {
+          "autocorr_lag1": 0.086,
+          "interpretation": "low_clustering",
+          "llm_hint": "Gaps are independent: no serial pattern"
+        },
+        "directional_bias": {
+          "up_gap_frequency_pct": 5.8,
+          "down_gap_frequency_pct": 4.5,
+          "up_gap_count": 22,
+          "down_gap_count": 17,
+          "bias_label": "symmetric",
+          "llm_hint": "Symmetric gaps: no directional preference"
+        }
+      },
+      "20d": {
+        "frequency_pct": 7.7,
+        "amplitude_avg": 0.015263,
+        "amplitude_max": 0.035894,
+        "gap_quantiles": {
+          "p10": 0.006336,
+          "p25": 0.008731,
+          "p50": 0.012341,
+          "p75": 0.020187,
+          "p90": 0.025729,
+          "p95": 0.027355
+        },
+        "n_gaps": 28,
+        "gap_sigma_distribution": {
+          "0.0-0.25σ": {
+            "count": 224,
+            "frequency_pct": 61.2,
+            "amplitude_avg": 0.000769,
+            "amplitude_max": 0.004412,
+            "amplitude_p90": 0.001758
+          },
+          "0.25-0.5σ": {
+            "count": 46,
+            "frequency_pct": 12.6,
+            "amplitude_avg": 0.00377,
+            "amplitude_max": 0.009931,
+            "amplitude_p90": 0.005803
+          },
+          "0.5-0.75σ": {
+            "count": 53,
+            "frequency_pct": 14.5,
+            "amplitude_avg": 0.006507,
+            "amplitude_max": 0.017525,
+            "amplitude_p90": 0.010853
+          },
+          "0.75-1.0σ": {
+            "count": 15,
+            "frequency_pct": 4.1,
+            "amplitude_avg": 0.008349,
+            "amplitude_max": 0.014115,
+            "amplitude_p90": 0.011605
+          },
+          "≥1.0σ": {
+            "count": 28,
+            "frequency_pct": 7.7,
+            "amplitude_avg": 0.015263,
+            "amplitude_max": 0.035894,
+            "amplitude_p90": 0.025729
+          }
+        },
+        "rolling_std_mean": 0.009612,
+        "available": true,
+        "gap_clustering": {
+          "autocorr_lag1": 0.11,
+          "interpretation": "low_clustering",
+          "llm_hint": "Gaps are independent: no serial pattern"
+        },
+        "directional_bias": {
+          "up_gap_frequency_pct": 4.1,
+          "down_gap_frequency_pct": 3.6,
+          "up_gap_count": 15,
+          "down_gap_count": 13,
+          "bias_label": "symmetric",
+          "llm_hint": "Symmetric gaps: no directional preference"
+        }
+      },
+      "60d": {
+        "frequency_pct": 4.0,
+        "amplitude_avg": 0.01694,
+        "amplitude_max": 0.027676,
+        "gap_quantiles": {
+          "p10": 0.009024,
+          "p25": 0.011959,
+          "p50": 0.019058,
+          "p75": 0.021625,
+          "p90": 0.02287,
+          "p95": 0.024794
+        },
+        "n_gaps": 13,
+        "gap_sigma_distribution": {
+          "0.0-0.25σ": {
+            "count": 213,
+            "frequency_pct": 65.3,
+            "amplitude_avg": 0.000795,
+            "amplitude_max": 0.003711,
+            "amplitude_p90": 0.001819
+          },
+          "0.25-0.5σ": {
+            "count": 47,
+            "frequency_pct": 14.4,
+            "amplitude_avg": 0.003837,
+            "amplitude_max": 0.007035,
+            "amplitude_p90": 0.00578
+          },
+          "0.5-0.75σ": {
+            "count": 36,
+            "frequency_pct": 11.0,
+            "amplitude_avg": 0.006823,
+            "amplitude_max": 0.011538,
+            "amplitude_p90": 0.009203
+          },
+          "0.75-1.0σ": {
+            "count": 17,
+            "frequency_pct": 5.2,
+            "amplitude_avg": 0.008962,
+            "amplitude_max": 0.012895,
+            "amplitude_p90": 0.012086
+          },
+          "≥1.0σ": {
+            "count": 13,
+            "frequency_pct": 4.0,
+            "amplitude_avg": 0.01694,
+            "amplitude_max": 0.027676,
+            "amplitude_p90": 0.02287
+          }
+        },
+        "rolling_std_mean": 0.009859,
+        "available": true,
+        "gap_clustering": {
+          "autocorr_lag1": 0.038,
+          "interpretation": "low_clustering",
+          "llm_hint": "Gaps are independent: no serial pattern"
+        },
+        "directional_bias": {
+          "up_gap_frequency_pct": 1.2,
+          "down_gap_frequency_pct": 2.8,
+          "up_gap_count": 4,
+          "down_gap_count": 9,
+          "bias_label": "strong_downside_bias",
+          "llm_hint": "Strong downside gap bias: prefer call-side strategies"
+        }
+      }
+    },
+    "F2_next": {
+      "5d": {
+        "frequency_pct": 15.3,
+        "amplitude_avg": 0.011197,
+        "amplitude_max": 0.038407,
+        "gap_quantiles": {
+          "p10": 0.004915,
+          "p25": 0.006558,
+          "p50": 0.009898,
+          "p75": 0.013387,
+          "p90": 0.020241,
+          "p95": 0.022931
+        },
+        "n_gaps": 56,
+        "gap_sigma_distribution": {
+          "0.0-0.25σ": {
+            "count": 157,
+            "frequency_pct": 43.0,
+            "amplitude_avg": 0.000825,
+            "amplitude_max": 0.00498,
+            "amplitude_p90": 0.001832
+          },
+          "0.25-0.5σ": {
+            "count": 71,
+            "frequency_pct": 19.5,
+            "amplitude_avg": 0.003868,
+            "amplitude_max": 0.013783,
+            "amplitude_p90": 0.007171
+          },
+          "0.5-0.75σ": {
+            "count": 53,
+            "frequency_pct": 14.5,
+            "amplitude_avg": 0.005493,
+            "amplitude_max": 0.019237,
+            "amplitude_p90": 0.009318
+          },
+          "0.75-1.0σ": {
+            "count": 28,
+            "frequency_pct": 7.7,
+            "amplitude_avg": 0.007059,
+            "amplitude_max": 0.015257,
+            "amplitude_p90": 0.010868
+          },
+          "≥1.0σ": {
+            "count": 56,
+            "frequency_pct": 15.3,
+            "amplitude_avg": 0.011197,
+            "amplitude_max": 0.038407,
+            "amplitude_p90": 0.020241
+          }
+        },
+        "rolling_std_mean": 0.009128,
+        "available": true,
+        "gap_clustering": {
+          "autocorr_lag1": 0.177,
+          "interpretation": "moderate_clustering",
+          "llm_hint": "Moderate gap clustering: weak serial correlation"
+        },
+        "directional_bias": {
+          "up_gap_frequency_pct": 6.3,
+          "down_gap_frequency_pct": 9.0,
+          "up_gap_count": 23,
+          "down_gap_count": 33,
+          "bias_label": "symmetric",
+          "llm_hint": "Symmetric gaps: no directional preference"
+        }
+      },
+      "20d": {
+        "frequency_pct": 10.6,
+        "amplitude_avg": 0.013983,
+        "amplitude_max": 0.038407,
+        "gap_quantiles": {
+          "p10": 0.008515,
+          "p25": 0.010301,
+          "p50": 0.011567,
+          "p75": 0.016129,
+          "p90": 0.021857,
+          "p95": 0.02375
+        },
+        "n_gaps": 37,
+        "gap_sigma_distribution": {
+          "0.0-0.25σ": {
+            "count": 163,
+            "frequency_pct": 46.6,
+            "amplitude_avg": 0.000902,
+            "amplitude_max": 0.004962,
+            "amplitude_p90": 0.001845
+          },
+          "0.25-0.5σ": {
+            "count": 69,
+            "frequency_pct": 19.7,
+            "amplitude_avg": 0.003774,
+            "amplitude_max": 0.00942,
+            "amplitude_p90": 0.006287
+          },
+          "0.5-0.75σ": {
+            "count": 54,
+            "frequency_pct": 15.4,
+            "amplitude_avg": 0.006449,
+            "amplitude_max": 0.016252,
+            "amplitude_p90": 0.009724
+          },
+          "0.75-1.0σ": {
+            "count": 27,
+            "frequency_pct": 7.7,
+            "amplitude_avg": 0.007859,
+            "amplitude_max": 0.019237,
+            "amplitude_p90": 0.010752
+          },
+          "≥1.0σ": {
+            "count": 37,
+            "frequency_pct": 10.6,
+            "amplitude_avg": 0.013983,
+            "amplitude_max": 0.038407,
+            "amplitude_p90": 0.021857
+          }
+        },
+        "rolling_std_mean": 0.009834,
+        "available": true,
+        "gap_clustering": {
+          "autocorr_lag1": 0.305,
+          "interpretation": "high_clustering",
+          "llm_hint": "Gaps cluster in series: after gap, expect another gap"
+        },
+        "directional_bias": {
+          "up_gap_frequency_pct": 5.7,
+          "down_gap_frequency_pct": 4.9,
+          "up_gap_count": 20,
+          "down_gap_count": 17,
+          "bias_label": "symmetric",
+          "llm_hint": "Symmetric gaps: no directional preference"
+        }
+      },
+      "60d": {
+        "frequency_pct": 7.4,
+        "amplitude_avg": 0.015938,
+        "amplitude_max": 0.038407,
+        "gap_quantiles": {
+          "p10": 0.009458,
+          "p25": 0.010569,
+          "p50": 0.013655,
+          "p75": 0.020241,
+          "p90": 0.023217,
+          "p95": 0.02525
+        },
+        "n_gaps": 23,
+        "gap_sigma_distribution": {
+          "0.0-0.25σ": {
+            "count": 155,
+            "frequency_pct": 50.0,
+            "amplitude_avg": 0.000916,
+            "amplitude_max": 0.004027,
+            "amplitude_p90": 0.001941
+          },
+          "0.25-0.5σ": {
+            "count": 65,
+            "frequency_pct": 21.0,
+            "amplitude_avg": 0.003952,
+            "amplitude_max": 0.008024,
+            "amplitude_p90": 0.006267
+          },
+          "0.5-0.75σ": {
+            "count": 52,
+            "frequency_pct": 16.8,
+            "amplitude_avg": 0.007248,
+            "amplitude_max": 0.011871,
+            "amplitude_p90": 0.010382
+          },
+          "0.75-1.0σ": {
+            "count": 15,
+            "frequency_pct": 4.8,
+            "amplitude_avg": 0.007508,
+            "amplitude_max": 0.010411,
+            "amplitude_p90": 0.009423
+          },
+          "≥1.0σ": {
+            "count": 23,
+            "frequency_pct": 7.4,
+            "amplitude_avg": 0.015938,
+            "amplitude_max": 0.038407,
+            "amplitude_p90": 0.023217
+          }
+        },
+        "rolling_std_mean": 0.009966,
+        "available": true,
+        "gap_clustering": {
+          "autocorr_lag1": 0.201,
+          "interpretation": "moderate_clustering",
+          "llm_hint": "Moderate gap clustering: weak serial correlation"
+        },
+        "directional_bias": {
+          "up_gap_frequency_pct": 3.9,
+          "down_gap_frequency_pct": 3.5,
+          "up_gap_count": 12,
+          "down_gap_count": 11,
+          "bias_label": "symmetric",
+          "llm_hint": "Symmetric gaps: no directional preference"
+        }
+      }
+    }
+  },
+  "percentile_ranks": {
+    "F1_YZ_5d_pct_250d": 70.4,
+    "F1_YZ_20d_pct_250d": 60.8,
+    "F1_YZ_60d_pct_250d": 46.0
+  },
+  "cross_contract_metrics": {
+    "spread_f1_f2_YZ_20d": 0.0048,
+    "ratio_f1_f2_YZ_20d": 1.0314,
+    "spread_f1_f2_YZ_5d": 0.003,
+    "basis_vol_5d": 0.012048,
+    "basis_vol_20d": 0.022259,
+    "term_structure_direction": "backwardation",
+    "front_specific_stress": {
+      "value": -0.0797,
+      "label": "normal"
+    },
+    "llm_hint": "Cross-contract volatility metrics for term structure and calendar strategy analysis. Spread = F1 - F2, positive = backwardation."
+  }
+}
