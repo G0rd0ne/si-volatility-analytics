@@ -1,0 +1,126 @@
+{
+  "modeling_framework": {
+    "metadata": {
+      "name": "Hybrid GAS-ARSVJ-EVT Si Forecasting Engine",
+      "version": "1.0",
+      "target_instrument": "MOEX Si Futures (F0, F1, F2, F-n)",
+      "objective": "Forecast conditional probability density f(S_T) with asymmetric spread for T1 (nearest Thursday) and T2 (next Thursday) based solely on realized underlying data",
+      "output_horizons": ["T1_nearest_Thu", "T2_next_Thu"]
+    },
+    "input_schema": {
+      "F0_expired": ["YZ_20d", "CC_20d", "semivar_down_20d", "semivar_up_20d"],
+      "F1_current": ["YZ_5d", "YZ_20d", "YZ_60d", "YZ_250d", "CC_5d", "CC_20d", "skew_5d", "skew_20d", "kurtosis_5d", "kurtosis_20d", "semivar_down_5d", "semivar_up_5d", "semivar_down_20d", "semivar_up_20d", "vol_of_vol_5d", "ROC_5d"],
+      "F2_next": ["YZ_20d", "YZ_60d", "basis_vol_20d", "semivar_down_20d", "semivar_up_20d"],
+      "Cross_Contract": ["spread_f1_f2_YZ_20d", "term_structure_direction"],
+      "Gap_Analysis": ["frequency_pct_5d", "frequency_pct_60d", "amplitude_ratio_5d_60d", "gap_clustering_autocorr_lag1", "directional_bias_label"]
+    },
+    "model_architecture": {
+      "stage_1_filtering": {
+        "model": "GAS-X (Generalized Autoregressive Score with Exogenous Variables)",
+        "distribution": "GHST (Generalized Hyperbolic Skewed Student-t)",
+        "objective": "Filter latent local state parameters: drift (mu), vol (sigma), skewness (zeta), kurtosis (kappa)",
+        "update_equation": "theta_{t+1} = omega + A * s_t + B * theta_t + Gamma * X_t",
+        "score_definition": "s_t = grad(log(p(y_t | theta_t)))",
+        "exogenous_variables_X_t": {
+          "delta_F2_F1": {
+            "source": "spread_f1_f2_YZ_20d",
+            "impact_sigma": "Positive spread (Backwardation) increases sigma_{t+1} but induces negative drift on future vol (mean-reversion expectation). Negative spread (Contango) implies stability.",
+            "impact_strategy": "Determines mean-reversion speed for Calendars and wing pricing for BWB."
+          },
+          "DoW_DayOfWeek": {
+            "source": "Temporal features (Is_Thu, Is_Fri, Is_Mon)",
+            "impact_mu": "Shifts expected drift based on specific weekday anomalies (e.g., Thursday pre-clearing drift).",
+            "impact_zeta": "Shifts expected skewness (e.g., Friday/Thursday negative skew for downside gap risk)."
+          },
+          "gap_metrics": {
+            "source": "gap_analysis frequency and amplitude ratios (5d/60d)",
+            "impact_kappa": "Elevated frequency/amplitude increases tail thickness forecast (kappa)."
+          }
+        }
+      },
+      "stage_2_simulation": {
+        "model": "ARSVJ (Affine Regime-Switching Jump-Diffusion)",
+        "objective": "Generate price trajectories using GAS-X outputs as initial conditions (S_0, v_0)",
+        "sde_price": "dS_t / S_t = mu_DoW * dt + sqrt(v_t) * dW_t^S + J_t * dN_t",
+        "sde_variance": "dv_t = kappa_spr * (theta_spr - v_t) * dt + xi * sqrt(v_t) * dW_t^v",
+        "parameter_mapping": {
+          "kappa_spr_MeanReversionSpeed": {
+            "logic": "Mapped to F2-F1 spread. If spread > 0 (Backwardation), kappa_spr is HIGH (vol is unstable, expects reversion to F2). If spread < 0 (Contango), kappa_spr is LOW."
+          },
+          "theta_spr_LongTermVol": {
+            "logic": "Anchored to YZ_250d and F2 vol metrics."
+          },
+          "dN_t_JumpProcess": {
+            "logic": "Intensity lambda_t is driven by gap_clustering_autocorr. If lag1 > 0.25, enable serial jump mode."
+          },
+          "J_t_JumpSize": {
+            "distribution": "Double Exponential (Kou Model)",
+            "p_down_Parameter": "Derived dynamically from semivar_down / semivar_up ratio. Critical for modeling asymmetric tail spread."
+          }
+        },
+        "rollover_logic_F1_to_F2": {
+          "condition": "Simulating beyond F1 expiry for T2 horizon",
+          "action": "Switch diffusion parameters from F1 to F2, inject basis_vol_20d as transition noise."
+        }
+      },
+      "stage_3_tail_approximation": {
+        "model": "EVT (Extreme Value Theory - Peak Over Threshold)",
+        "objective": "Correct diffusion underestimation of extreme moves (< 5% tail) for Condors/BWB wings",
+        "method": "POT (Peak Over Threshold)",
+        "distribution": "GPD (Generalized Pareto Distribution) with parameters (xi_EVT, beta)",
+        "calibration_data": "F-n historical returns filtered by high gap_frequency regimes"
+      }
+    },
+    "strategy_extraction_logic": {
+      "Iron_Condor": {
+        "requirement": "Range-bound, symmetric/controlled channel, low tail exit probability",
+        "metrics_to_extract": [
+          "Inter-Quantile Range: [q_10%, q_90%] for T1, [q_15%, q_85%] for T2",
+          "Wing Asymmetry Scaling: If P(S < q_10%) != P(S > q_90%), scale put-wing width by (semivar_down / semivar_up)"
+        ],
+        "kill_condition": "EVT shape parameter xi_EVT > 0.3 (Fat tails detected)"
+      },
+      "Iron_Butterfly": {
+        "requirement": "Minimal variance around ATM, mode alignment with S_0",
+        "metrics_to_extract": [
+          "Mode alignment: Verify mode of f(S_T) matches current S_0",
+          "DoW Drift Adjustment: If DoW forces mu < 0, short strike must be shifted down"
+        ],
+        "kill_condition": "vol_of_vol_5d > 0.4 (Vomma destroys ATM profile)"
+      },
+      "BWB_Broken_Wing_Butterfly": {
+        "requirement": "Strong directional skew in distribution",
+        "metrics_to_extract": [
+          "Conditional Probability Shift: Delta_P = P(S_T < S_0 - delta) - P(S_T > S_0 + delta)",
+          "GAS Skew Forecast: Evaluate zeta_{T_thu}. If left-skewed (downside), construct Put BWB.",
+          "Backwardation Edge: If F1 > F2 vol, sell F1 wing, buy F2 wing (vol mean-reversion gives 'free' long wing)."
+        ],
+        "direction_logic": "Put BWB if semivar ratio > 1.3 and zeta < 0; Call BWB if ratio < 0.7 and zeta > 0."
+      },
+      "Debit_Vertical": {
+        "requirement": "Directional drift (mu) or momentum acceleration",
+        "metrics_to_extract": [
+          "GAS-X Drift: Evaluate mu_hat for T1/T2 incorporating DoW effects.",
+          "ROC Momentum: If ROC_5d > 30%, process is non-stationary, ARSVJ simulates trend continuation.",
+          "Gap Clustering: If high_clustering + downside_bias, Put Vertical has mathematical edge (cascade risk)."
+        ],
+        "direction_logic": "Follow mu_hat direction and gap bias."
+      },
+      "Calendar": {
+        "requirement": "Volatility spread mean-reversion between F1 and F2",
+        "metrics_to_extract": [
+          "F2-F1 Spread Forecast: If YZ_F1 - YZ_F2 > 0 (Backwardation) and kappa_spr is HIGH, model predicts v_F1 drop and v_F2 rise (spread convergence).",
+          "DoW Session Compression: If GAS-X indicates sigma_DoW=Thu < sigma_avg, entry on Thursday optimizes short-leg sale."
+        ],
+        "validity_condition": "Long Calendar valid ONLY in Backwardation with high mean-reversion speed. Forbidden in Contango."
+      }
+    },
+    "implementation_pipeline_python": {
+      "step_1_preprocessing": "Extract S_t, YZ, semivar ratios, gap metrics. Form matrices for X_t (Spreads, DoW).",
+      "step_2_gas_x_estimation": "Maximize log-likelihood of GHST distribution. Output filtered theta_hat_t (mu, sigma, zeta, kappa).",
+      "step_3_arsvj_simulation": "Euler-Maruyama scheme with Sobol quasi-random numbers. Kou jump thinning algorithm. N=100,000 paths.",
+      "step_4_evt_overlay": "Filter simulated extremes > 90th percentile. Fit GPD via scipy.stats.genpareto.",
+      "step_5_output_generation": "Calculate quantiles (5, 10, 25, 50, 75, 90, 95) and Kernel Density Estimate. Evaluate strategy extraction logic rules."
+    }
+  }
+}
